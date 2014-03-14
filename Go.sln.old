@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Go", "Go.vcproj", "{E59E44B9-42C8-4136-9C12-301D08159700}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libx264enc", "..\x264enc\build\win32\libx264_vs2005.vcproj", "{A8D6E4CD-1885-4B03-8E41-5F3DB825BAA6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "main", "..\51CTO下载-H264Decoder_vc6\main.vcproj", "{2E500A73-4EB8-444A-96A8-CBDB4BEEAF47}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "x264", "..\x264enc\build\win32\x264_vs2005.vcproj", "{22E1814D-7955-4456-AEA5-0C9BA7500792}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		Release64|Win32 = Release64|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E59E44B9-42C8-4136-9C12-301D08159700}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E59E44B9-42C8-4136-9C12-301D08159700}.Debug|Win32.Build.0 = Debug|Win32
+		{E59E44B9-42C8-4136-9C12-301D08159700}.Release|Win32.ActiveCfg = Release|Win32
+		{E59E44B9-42C8-4136-9C12-301D08159700}.Release|Win32.Build.0 = Release|Win32
+		{E59E44B9-42C8-4136-9C12-301D08159700}.Release64|Win32.ActiveCfg = Release|Win32
+		{E59E44B9-42C8-4136-9C12-301D08159700}.Release64|Win32.Build.0 = Release|Win32
+		{A8D6E4CD-1885-4B03-8E41-5F3DB825BAA6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A8D6E4CD-1885-4B03-8E41-5F3DB825BAA6}.Debug|Win32.Build.0 = Debug|Win32
+		{A8D6E4CD-1885-4B03-8E41-5F3DB825BAA6}.Release|Win32.ActiveCfg = Release|Win32
+		{A8D6E4CD-1885-4B03-8E41-5F3DB825BAA6}.Release|Win32.Build.0 = Release|Win32
+		{A8D6E4CD-1885-4B03-8E41-5F3DB825BAA6}.Release64|Win32.ActiveCfg = Release|Win32
+		{A8D6E4CD-1885-4B03-8E41-5F3DB825BAA6}.Release64|Win32.Build.0 = Release|Win32
+		{2E500A73-4EB8-444A-96A8-CBDB4BEEAF47}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2E500A73-4EB8-444A-96A8-CBDB4BEEAF47}.Debug|Win32.Build.0 = Debug|Win32
+		{2E500A73-4EB8-444A-96A8-CBDB4BEEAF47}.Release|Win32.ActiveCfg = Release|Win32
+		{2E500A73-4EB8-444A-96A8-CBDB4BEEAF47}.Release|Win32.Build.0 = Release|Win32
+		{2E500A73-4EB8-444A-96A8-CBDB4BEEAF47}.Release64|Win32.ActiveCfg = Release|Win32
+		{2E500A73-4EB8-444A-96A8-CBDB4BEEAF47}.Release64|Win32.Build.0 = Release|Win32
+		{22E1814D-7955-4456-AEA5-0C9BA7500792}.Debug|Win32.ActiveCfg = Debug|Win32
+		{22E1814D-7955-4456-AEA5-0C9BA7500792}.Debug|Win32.Build.0 = Debug|Win32
+		{22E1814D-7955-4456-AEA5-0C9BA7500792}.Release|Win32.ActiveCfg = Release|Win32
+		{22E1814D-7955-4456-AEA5-0C9BA7500792}.Release|Win32.Build.0 = Release|Win32
+		{22E1814D-7955-4456-AEA5-0C9BA7500792}.Release64|Win32.ActiveCfg = Release|Win32
+		{22E1814D-7955-4456-AEA5-0C9BA7500792}.Release64|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
