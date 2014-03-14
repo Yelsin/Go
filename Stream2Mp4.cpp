@@ -392,7 +392,7 @@ Exit0:
 	return false;
 }
 
-
+// 添加mp4文件头
 bool CreateMp4(const char* pszFileName, int nWidth, int nHeight, AVFormatContext *m_pOc, AVStream *m_pVideoSt)
 {
 	av_register_all();
@@ -421,28 +421,45 @@ Exit0:
 	return false;
 }
 
+// 向mp4文件中写h264数据
 bool WriteVideo(AVFormatContext *m_pOc, AVStream *m_pVideoSt, unsigned char* data, int nLen)
 {
 	AVCodecContext *c = m_pVideoSt->codec;
 	if (nLen > 0)
 	{
-		AVPacket pkt = {0};
-		const AVRational *time_base = &m_pVideoSt->codec->time_base;
+		//AVPacket pkt = {0};
+		//const AVRational *time_base = &m_pVideoSt->codec->time_base;
+		//av_init_packet(&pkt);
+
+		////m_qwFileSize += nLen;
+		//pkt.pts = av_rescale_q_rnd(pkt.pts, *time_base, m_pVideoSt->time_base, (AVRounding)(AV_ROUND_NEAR_INF|AV_ROUND_PASS_MINMAX));
+		//pkt.dts = av_rescale_q_rnd(pkt.dts, *time_base, m_pVideoSt->time_base, (AVRounding)(AV_ROUND_NEAR_INF|AV_ROUND_PASS_MINMAX));
+		//pkt.duration = av_rescale_q(pkt.duration, *time_base, m_pVideoSt->time_base);
+		///*pkt.pts = av_rescale_q(c->coded_frame->pts, c->time_base, m_pVideoSt->time_base);
+		//if (c->coded_frame->key_frame)
+		//{
+		//	pkt.flags |= AV_PKT_FLAG_KEY;
+		//}*/
+		//pkt.stream_index = m_pVideoSt->index;
+		//pkt.data = (uint8_t *)data;
+		//pkt.size = nLen;
+
+		//av_interleaved_write_frame(m_pOc, &pkt);
+
+		AVPacket pkt;
 		av_init_packet(&pkt);
 
-		//m_qwFileSize += nLen;
-		pkt.pts = av_rescale_q_rnd(pkt.pts, *time_base, m_pVideoSt->time_base, (AVRounding)(AV_ROUND_NEAR_INF|AV_ROUND_PASS_MINMAX));
-		pkt.dts = av_rescale_q_rnd(pkt.dts, *time_base, m_pVideoSt->time_base, (AVRounding)(AV_ROUND_NEAR_INF|AV_ROUND_PASS_MINMAX));
-		pkt.duration = av_rescale_q(pkt.duration, *time_base, m_pVideoSt->time_base);
-		/*pkt.pts = av_rescale_q(c->coded_frame->pts, c->time_base, m_pVideoSt->time_base);
-		if (c->coded_frame->key_frame)
+		if (c->coded_frame->pts != AV_NOPTS_VALUE)
 		{
+			pkt.pts = av_rescale_q(c->coded_frame->pts, c->time_base, st->time_base);
+		}
+		if(c->coded_frame->key_frame)
 			pkt.flags |= AV_PKT_FLAG_KEY;
-		}*/
-		pkt.stream_index = m_pVideoSt->index;
-		pkt.data = (uint8_t *)data;
-		pkt.size = nLen;
+		pkt.stream_index= m_pVideoSt->index;
+		pkt.data= (uint8_t *)data;
+		pkt.size= nLen;
 
+		/* write the compressed frame in the media file */
 		av_interleaved_write_frame(m_pOc, &pkt);
 
 		return true;
@@ -450,6 +467,7 @@ bool WriteVideo(AVFormatContext *m_pOc, AVStream *m_pVideoSt, unsigned char* dat
 	return false;
 }
 
+// 向mp4文件添加文件尾，关闭资源
 void CloseMp4(AVFormatContext *m_pOc, AVStream *m_pVideoSt)
 {
 	if (m_pOc)
