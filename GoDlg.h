@@ -12,7 +12,7 @@
 #include "udp.h"
 #include "myx264.h"
 #include "afxwin.h"
-#include "StreamToMp4.h"
+#include "Stream2Mp4.h"
 /////////////////////////////////////////////////////////////////////////////
 // CGoDlg dialog
 

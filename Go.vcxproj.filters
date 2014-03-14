@@ -39,7 +39,7 @@
     <ClCompile Include="VIDEORender.CPP">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="StreamToMp4.cpp">
+    <ClCompile Include="Stream2Mp4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -76,7 +76,7 @@
     <ClInclude Include="VIDEORender.H">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StreamToMp4.h">
+    <ClInclude Include="Stream2Mp4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

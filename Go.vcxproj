@@ -170,7 +170,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="StreamToMp4.cpp" />
+    <ClCompile Include="Stream2Mp4.cpp" />
     <ClCompile Include="Udp.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -197,7 +197,7 @@
     <ClInclude Include="myx264.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />
-    <ClInclude Include="StreamToMp4.h" />
+    <ClInclude Include="Stream2Mp4.h" />
     <ClInclude Include="Udp.h" />
     <ClInclude Include="VIDEOCAP.H" />
     <ClInclude Include="VIDEORender.H" />
