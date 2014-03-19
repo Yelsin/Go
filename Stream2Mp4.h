@@ -30,6 +30,10 @@ extern "C" {
 
 #define BUF_SIZE 4096*500
 
+#if _MSC_VER
+#define snprintf _snprintf
+#endif
+
 /* 5 seconds stream duration */
 #define STREAM_DURATION   200.0
 #define STREAM_FRAME_RATE 25 /* 25 images/s */
@@ -84,8 +88,9 @@ void write_video_frame(AVFormatContext *oc, AVStream *st);
 void close_video(AVFormatContext *oc, AVStream *st);
 
 
-bool AddStream(AVFormatContext *m_pOc,AVStream *m_pVideoSt, int nWidth, int nHeight);
-bool CreateMp4(const char* pszFileName, int nWidth, int nHeight, AVFormatContext *m_pOc, AVStream *m_pVideoSt);
+//bool AddStream(AVFormatContext *m_pOc,AVStream *m_pVideoSt, int nWidth, int nHeight);
+//bool CreateMp4(const char* pszFileName, int nWidth, int nHeight, AVFormatContext *m_pOc, AVStream *m_pVideoSt);
+bool CreateMp4(const char* pszFileName, AVFormatContext *m_pOc, AVStream *m_pVideoSt);
 bool WriteVideo(AVFormatContext *m_pOc, AVStream *m_pVideoSt, unsigned char* data, int nLen);
 void CloseMp4(AVFormatContext *m_pOc, AVStream *m_pVideoSt);
 

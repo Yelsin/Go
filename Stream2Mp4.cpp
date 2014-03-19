@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <stdio.h>
 #include "Stream2Mp4.h"
 
 int open_codec_context(int *stream_idx,
@@ -359,99 +360,66 @@ void close_video(AVFormatContext *oc, AVStream *st)
     av_free(frame);
 }
 
-
-
-bool AddStream(AVFormatContext *m_pOc,AVStream *m_pVideoSt, int nWidth, int nHeight)
+bool CreateMp4(const char* mp4FileName, AVFormatContext *m_pOc, AVStream *m_pVideoSt)
 {
-	AVCodecContext *pC;
-	m_pVideoSt = avformat_new_stream(m_pOc, NULL);
-	if (!m_pVideoSt)
-		goto Exit0;
-
-	m_pVideoSt->id = m_pOc->nb_streams-1;
-	pC = m_pVideoSt->codec;
-
-	pC->codec_id = CODEC_ID_H264;
-
-	pC->bit_rate = 400000;
-	pC->width    = nWidth;
-	pC->height   = nHeight;
-	pC->time_base.den = STREAM_FRAME_RATE;
-	pC->time_base.num = 1;
-	pC->gop_size      = 12;
-	pC->pix_fmt       = STREAM_PIX_FMT;
-	if (pC->codec_id == AV_CODEC_ID_MPEG2VIDEO)
-		pC->max_b_frames = 2;
-	if (pC->codec_id == AV_CODEC_ID_MPEG1VIDEO) 
-		pC->mb_decision = 2;
-
-	if (m_pOc->oformat->flags & AVFMT_GLOBALHEADER)
-		pC->flags |= CODEC_FLAG_GLOBAL_HEADER;
-	return true;
-Exit0:
-	return false;
-}
-
-// 添加mp4文件头
-bool CreateMp4(const char* pszFileName, int nWidth, int nHeight, AVFormatContext *m_pOc, AVStream *m_pVideoSt)
-{
-	av_register_all();
 	AVOutputFormat* pFmt;
-	avformat_alloc_output_context2(&m_pOc, NULL, NULL, pszFileName);
+	AVCodec *video_codec;
+	AVStream *video_st;
+	int ret;
+
+	av_register_all();
+
+	avformat_alloc_output_context2(&m_pOc, NULL, NULL, mp4FileName);
 	if (!m_pOc)
-		avformat_alloc_output_context2(&m_pOc, NULL, "mpeg", pszFileName);
-	if (!m_pOc)
-		goto Exit0;
+		avformat_alloc_output_context2(&m_pOc, NULL, "mpeg", mp4FileName);
+
 	pFmt = m_pOc->oformat;
 
-	if (!AddStream(m_pOc, m_pVideoSt, nWidth, nHeight))
-		goto Exit0;
+    /* Add the audio and video streams using the default format codecs
+     * and initialize the codecs. */
+    video_st = NULL;
+	pFmt->video_codec = AV_CODEC_ID_H264;
 
-	if (!(pFmt->flags & AVFMT_NOFILE))
+    if (pFmt->video_codec != AV_CODEC_ID_NONE) {
+        video_st = add_stream(m_pOc, &video_codec, pFmt->video_codec);
+    }
+    /* Now that all the parameters are set, we can open the audio and
+     * video codecs and allocate the necessary encode buffers. */
+    if (video_st)
+        open_video(m_pOc, video_codec, video_st);
+    av_dump_format(m_pOc, 0, mp4FileName, 1);
+    /* open the output file, if needed */
+    if (!(pFmt->flags & AVFMT_NOFILE)) {
+        ret = avio_open(&m_pOc->pb, mp4FileName, AVIO_FLAG_WRITE);
+        if (ret < 0) {
+            /*fprintf(stderr, "Could not open '%s': %s\n", filename,
+                    av_err2str(ret));*/
+            return false;
+        }
+    }
+    /* Write the stream header, if any. */
+    ret = avformat_write_header(m_pOc, NULL);
+	if (ret < 0)
 	{
-		if (avio_open(&m_pOc->pb, pszFileName, AVIO_FLAG_WRITE) < 0)
-			goto Exit0;
+		return false;
 	}
 
-	if (avformat_write_header(m_pOc, NULL) < 0)
-		goto Exit0;
-
 	return true;
-Exit0:
-	return false;
+
 }
 
-// 向mp4文件中写h264数据
 bool WriteVideo(AVFormatContext *m_pOc, AVStream *m_pVideoSt, unsigned char* data, int nLen)
 {
 	AVCodecContext *c = m_pVideoSt->codec;
 	if (nLen > 0)
 	{
-		//AVPacket pkt = {0};
-		//const AVRational *time_base = &m_pVideoSt->codec->time_base;
-		//av_init_packet(&pkt);
-
-		////m_qwFileSize += nLen;
-		//pkt.pts = av_rescale_q_rnd(pkt.pts, *time_base, m_pVideoSt->time_base, (AVRounding)(AV_ROUND_NEAR_INF|AV_ROUND_PASS_MINMAX));
-		//pkt.dts = av_rescale_q_rnd(pkt.dts, *time_base, m_pVideoSt->time_base, (AVRounding)(AV_ROUND_NEAR_INF|AV_ROUND_PASS_MINMAX));
-		//pkt.duration = av_rescale_q(pkt.duration, *time_base, m_pVideoSt->time_base);
-		///*pkt.pts = av_rescale_q(c->coded_frame->pts, c->time_base, m_pVideoSt->time_base);
-		//if (c->coded_frame->key_frame)
-		//{
-		//	pkt.flags |= AV_PKT_FLAG_KEY;
-		//}*/
-		//pkt.stream_index = m_pVideoSt->index;
-		//pkt.data = (uint8_t *)data;
-		//pkt.size = nLen;
-
-		//av_interleaved_write_frame(m_pOc, &pkt);
 
 		AVPacket pkt;
 		av_init_packet(&pkt);
 
 		if (c->coded_frame->pts != AV_NOPTS_VALUE)
 		{
-			pkt.pts = av_rescale_q(c->coded_frame->pts, c->time_base, st->time_base);
+			pkt.pts = av_rescale_q(c->coded_frame->pts, c->time_base, m_pVideoSt->time_base);
 		}
 		if(c->coded_frame->key_frame)
 			pkt.flags |= AV_PKT_FLAG_KEY;
@@ -467,9 +435,10 @@ bool WriteVideo(AVFormatContext *m_pOc, AVStream *m_pVideoSt, unsigned char* dat
 	return false;
 }
 
-// 向mp4文件添加文件尾，关闭资源
+
 void CloseMp4(AVFormatContext *m_pOc, AVStream *m_pVideoSt)
 {
+
 	if (m_pOc)
 		av_write_trailer(m_pOc);
 
@@ -483,5 +452,4 @@ void CloseMp4(AVFormatContext *m_pOc, AVStream *m_pVideoSt)
 		avformat_free_context(m_pOc);
 		m_pOc = NULL;
 	}
-	//m_qwFileSize = 0;
 }

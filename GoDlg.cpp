@@ -246,7 +246,18 @@ LRESULT CGoDlg::OnVideo(WPARAM l,LPARAM w)
 	time2=::GetCurrentTime();
 	span1=time2-time1;
 	this->m_total+=length;
+
+	// 此处添加处理h264数据流，将其封装为mp4文件
+	CreateMp4("output.mp4", m_pOc, m_pVideoSt);
+	if (frame)
+	{
+		frame->pts = 0;
+	}
+
 	this->Deal264();
+
+	CloseMp4(m_pOc, m_pVideoSt);
+
 	time1=::GetCurrentTime();
 	span2=time1-time2;
 	//*	logfile(100,m_p264[index],length);
@@ -316,7 +327,8 @@ int CGoDlg::Deal264()
 			logfile(200,&(this->m_p264[i][3]),len);
 
 			// 此处添加处理NALU的代码
-
+			WriteVideo(m_pOc, m_pVideoSt, &(this->m_p264[i][3]),len);
+			frame->pts += av_rescale_q(1, m_pVideoSt->codec->time_base, m_pVideoSt->time_base);
 
 			cost=Decode(this->m_p264dec,&len,&(this->m_p264[i][1]));
 			if(cost<=0)continue;

@@ -64,6 +64,11 @@ private:
 	bool m_bLinked;
 	CUdp m_udp;
 	long m_total;
+
+	AVFormatContext *m_pOc;
+	AVStream *m_pVideoSt;
+	//AVFrame *frame;
+
 private:
 	bool Init();
 	int FindIndex264();
