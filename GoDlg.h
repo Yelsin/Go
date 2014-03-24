@@ -72,7 +72,8 @@ private:
 private:
 	bool Init();
 	int FindIndex264();
-	int Deal264();
+	//int Deal264();
+	int Deal264(AVFormatContext* &m_pOc, AVStream* &m_pVideoSt);
 private:
 	CStatic m_len;
 	CStatic m_pic264;
@@ -81,6 +82,10 @@ private:
 	CStatic m_tlen;
 	CStatic m_kbs;
 	CStatic m_timespan;
+public:
+//	afx_msg void OnDestroy();
+	afx_msg void OnClose();
+	afx_msg void OnBnClickedButton1();
 };
 
 //{{AFX_INSERT_LOCATION}}

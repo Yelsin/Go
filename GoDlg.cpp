@@ -1,10 +1,12 @@
-// GoDlg.cpp : implementation file
+ï»¿// GoDlg.cpp : implementation file
 //
 
 #include "stdafx.h"
 #include "Go.h"
 #include "GoDlg.h"
 #include "lib263.h"
+#include <iostream>
+using namespace std;
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -35,6 +37,8 @@ protected:
 	//{{AFX_MSG(CAboutDlg)
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+//	afx_msg void OnClose();
 };
 
 CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
@@ -54,6 +58,7 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 	//{{AFX_MSG_MAP(CAboutDlg)
 	// No message handlers
 	//}}AFX_MSG_MAP
+//	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -92,6 +97,9 @@ BEGIN_MESSAGE_MAP(CGoDlg, CDialog)
 	ON_MESSAGE(MSG_VIDEO,OnVideo)
 	ON_WM_TIMER()
 	//}}AFX_MSG_MAP
+//	ON_WM_DESTROY()
+	ON_WM_CLOSE()
+	ON_BN_CLICKED(IDC_BUTTON1, &CGoDlg::OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -218,6 +226,8 @@ bool CGoDlg::Init()
 
 	Initx264(WIDTH,HEIGHT,25);
 	Initx264dec();
+	CreateMp4("output.mp4", 640, 480, m_pOc, m_pVideoSt);
+
 	return true;
 }
 
@@ -228,7 +238,7 @@ LRESULT CGoDlg::OnVideo(WPARAM l,LPARAM w)
 	iii++;
 	//	if(iii%4!=0)return 0;
 	CString sss;
-	sss.Format("Ö¡:%d",iii);
+	sss.Format("å¸§:%d",iii);
 	this->m_info.SetWindowText(sss);
 	//time
 	long time1,time2,span1,span2;
@@ -247,24 +257,18 @@ LRESULT CGoDlg::OnVideo(WPARAM l,LPARAM w)
 	span1=time2-time1;
 	this->m_total+=length;
 
-	// ´Ë´¦Ìí¼Ó´¦Àíh264Êý¾ÝÁ÷£¬½«Æä·â×°Îªmp4ÎÄ¼þ
-	CreateMp4("output.mp4", m_pOc, m_pVideoSt);
-	if (frame)
-	{
-		frame->pts = 0;
-	}
+	// æ­¤å¤„æ·»åŠ å¤„ç†h264æ•°æ®æµï¼Œå°†å…¶å°è£…ä¸ºmp4æ–‡ä»¶
+	
+	this->Deal264(m_pOc, m_pVideoSt);
 
-	this->Deal264();
-
-	CloseMp4(m_pOc, m_pVideoSt);
 
 	time1=::GetCurrentTime();
 	span2=time1-time2;
 	//*	logfile(100,m_p264[index],length);
 	//	logyuv(this->m_pI420,l);
-	sss.Format("³¤¶È:%d",length);
+	sss.Format("é•¿åº¦:%d",length);
 	this->m_len.SetWindowTextA(sss);
-	sss.Format("±àÂë:%ld,½âÂë%ld(ºÁÃë)",span1,span2);
+	sss.Format("ç¼–ç :%ld,è§£ç %ld(æ¯«ç§’)",span1,span2);
 	this->m_timespan.SetWindowTextA(sss);
 	pRGB=this->m_pBuf[index];
 	YUY2toRGB((BYTE*)w,pRGB,l);
@@ -278,6 +282,7 @@ LRESULT CGoDlg::OnVideo(WPARAM l,LPARAM w)
 
 	//	if(iii%2==0)this->OnVideo(l,w);
 	//	((BYTE*)l)[0]=0;
+
 	return 0;
 	////
 
@@ -290,11 +295,11 @@ void CGoDlg::OnTimer(UINT nIDEvent)
 	static long int tick=0;
 	tick++;
 	CString s;
-	s.Format("Ãë:%d",tick);
+	s.Format("ç§’:%d",tick);
 	this->m_showtime.SetWindowTextA(s);
-	s.Format("×Ü³¤:%dKB",this->m_total/1024);
+	s.Format("æ€»é•¿:%dKB",this->m_total/1024);
 	this->m_tlen.SetWindowTextA(s);
-	s.Format("ÂëÂÊ:%dkb/s",this->m_total/tick/1024*8);
+	s.Format("ç çŽ‡:%dkb/s",this->m_total/tick/1024*8);
 	this->m_kbs.SetWindowTextA(s);
 	//	CDialog::OnTimer(nIDEvent);
 }
@@ -312,23 +317,26 @@ int CGoDlg::FindIndex264()
 
 
 
-int CGoDlg::Deal264()
+int CGoDlg::Deal264(AVFormatContext* &m_pOc, AVStream* &m_pVideoSt)
 {
-	
+	bool isWriteVideo = false;
 	for(int i=0;i<15;i++)
 	{
 		if(this->m_p264[i][0]==1)
 		{
-			// m_p264[i]´ú±íÒ»¸öNALUµ¥Ôª£¬µÚÒ»Î»Îª±êÖ¾Î»£¬±íÊ¾ÊÇ·ñ¿ÉÓÃ£¬µÚ¶þÎ»ºÍµÚÈýÎ»´ú±íNALU³¤¶È£¬µÚËÄÎ»¿ªÊ¼ÎªNALUÊý¾Ý
+			// m_p264[i]ä»£è¡¨ä¸€ä¸ªNALUå•å…ƒï¼Œç¬¬ä¸€ä½ä¸ºæ ‡å¿—ä½ï¼Œè¡¨ç¤ºæ˜¯å¦å¯ç”¨ï¼Œç¬¬äºŒä½å’Œç¬¬ä¸‰ä½ä»£è¡¨NALUé•¿åº¦ï¼Œç¬¬å››ä½å¼€å§‹ä¸ºNALUæ•°æ®
 			this->m_p264[i][0]=0; 
 			//todo:
 			int cost,len;
 			len=this->m_p264[i][1]+((this->m_p264[i][2])<<8);
 			logfile(200,&(this->m_p264[i][3]),len);
 
-			// ´Ë´¦Ìí¼Ó´¦ÀíNALUµÄ´úÂë
-			WriteVideo(m_pOc, m_pVideoSt, &(this->m_p264[i][3]),len);
-			frame->pts += av_rescale_q(1, m_pVideoSt->codec->time_base, m_pVideoSt->time_base);
+			// æ­¤å¤„æ·»åŠ å¤„ç†NALUçš„ä»£ç 
+			isWriteVideo = WriteVideo(m_pOc, m_pVideoSt, &(this->m_p264[i][3]),len);
+			/*if (isWriteVideo)
+			{
+				cout << "is not writing video" << endl;
+			}*/
 
 			cost=Decode(this->m_p264dec,&len,&(this->m_p264[i][1]));
 			if(cost<=0)continue;
@@ -339,4 +347,40 @@ int CGoDlg::Deal264()
 
 
 	return 0;
+}
+
+
+
+
+
+
+void CGoDlg::OnClose()
+{
+	//CloseMp4(m_pOc, m_pVideoSt);
+
+	CDialog::OnClose();
+}
+
+
+void CGoDlg::OnBnClickedButton1()
+{
+	//CloseMp4(m_pOc, m_pVideoSt);
+	//cout << "The window will close" << endl;
+	
+	if (m_pOc)
+		av_write_trailer(m_pOc);
+
+	/*m_pVideoSt = NULL;
+
+	if (m_pOc && !(m_pOc->oformat->flags & AVFMT_NOFILE))
+	avio_close(m_pOc->pb);
+
+	if (m_pOc)
+	{
+	avformat_free_context(m_pOc);
+	m_pOc = NULL;
+	}*/
+
+	MessageBox("The window will close");
+	
 }

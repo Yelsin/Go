@@ -80,7 +80,7 @@ void close_audio(AVFormatContext *oc, AVStream *st);
 
 
 /* video output */
-static AVFrame *frame;
+extern AVFrame *frame;
 static AVPicture src_picture, dst_picture;
 static int frame_count;
 void open_video(AVFormatContext *oc, AVCodec *codec, AVStream *st);
@@ -88,10 +88,10 @@ void write_video_frame(AVFormatContext *oc, AVStream *st);
 void close_video(AVFormatContext *oc, AVStream *st);
 
 
-//bool AddStream(AVFormatContext *m_pOc,AVStream *m_pVideoSt, int nWidth, int nHeight);
-//bool CreateMp4(const char* pszFileName, int nWidth, int nHeight, AVFormatContext *m_pOc, AVStream *m_pVideoSt);
-bool CreateMp4(const char* pszFileName, AVFormatContext *m_pOc, AVStream *m_pVideoSt);
+bool AddStream(AVFormatContext *&m_pOc,AVStream *&m_pVideoSt, int nWidth, int nHeight);
+bool CreateMp4(const char* pszFileName, int nWidth, int nHeight, AVFormatContext *&m_pOc, AVStream *&m_pVideoSt);
+//bool CreateMp4(const char* pszFileName, AVFormatContext *m_pOc, AVStream *m_pVideoSt);
 bool WriteVideo(AVFormatContext *m_pOc, AVStream *m_pVideoSt, unsigned char* data, int nLen);
-void CloseMp4(AVFormatContext *m_pOc, AVStream *m_pVideoSt);
+void CloseMp4(AVFormatContext *&m_pOc, AVStream *&m_pVideoSt);
 
 #endif //STREAM_TO_MP4_H
