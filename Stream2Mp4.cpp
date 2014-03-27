@@ -405,24 +405,34 @@ bool CreateMp4(const char* pszFileName, int nWidth, int nHeight, AVFormatContext
 	if (!m_pOc)
 		avformat_alloc_output_context2(&m_pOc, NULL, "mpeg", pszFileName);
 	if (!m_pOc)
-		goto Exit0;
+	{
+		printf("m_pOc is null");
+	}
 	pFmt = m_pOc->oformat;
 
 	if (!AddStream(m_pOc, m_pVideoSt, nWidth, nHeight))
-		goto Exit0;
+	{
+		printf("AddStream error");
+		return false;
+	}
 
 	if (!(pFmt->flags & AVFMT_NOFILE))
 	{
 		if (avio_open(&m_pOc->pb, pszFileName, AVIO_FLAG_WRITE) < 0)
-			goto Exit0;
+		{
+			printf("avio_open error");
+			return false;
+		}
 	}
 
 	if (avformat_write_header(m_pOc, NULL) < 0)
-		goto Exit0;
+	{
+		printf("avformat_writer_header error");
+		return false;
+	}
 
 	return true;
-Exit0:
-	return false;
+
 }
 
 // 向mp4文件中写h264数据

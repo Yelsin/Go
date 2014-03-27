@@ -64,6 +64,8 @@ private:
 	bool m_bLinked;
 	CUdp m_udp;
 	long m_total;
+	
+	bool m_bStop; // 停止采集h264视频流
 
 	AVFormatContext *m_pOc;
 	AVStream *m_pVideoSt;

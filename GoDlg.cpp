@@ -224,6 +224,7 @@ bool CGoDlg::Init()
 	m_cap.Start();
 	this->m_bCap=true;
 
+	m_bStop = false;
 	Initx264(WIDTH,HEIGHT,25);
 	Initx264dec();
 	CreateMp4("output.mp4", 640, 480, m_pOc, m_pVideoSt);
@@ -258,8 +259,15 @@ LRESULT CGoDlg::OnVideo(WPARAM l,LPARAM w)
 	this->m_total+=length;
 
 	// 此处添加处理h264数据流，将其封装为mp4文件
-	
-	this->Deal264(m_pOc, m_pVideoSt);
+	if (!this->m_bStop)
+	{
+		this->Deal264(m_pOc, m_pVideoSt);
+
+	}
+	else
+	{
+		CloseMp4(m_pOc, m_pVideoSt);
+	}
 
 
 	time1=::GetCurrentTime();
@@ -356,8 +364,7 @@ int CGoDlg::Deal264(AVFormatContext* &m_pOc, AVStream* &m_pVideoSt)
 
 void CGoDlg::OnClose()
 {
-	//CloseMp4(m_pOc, m_pVideoSt);
-
+	//this->m_bStop = true;
 	CDialog::OnClose();
 }
 
@@ -367,19 +374,7 @@ void CGoDlg::OnBnClickedButton1()
 	//CloseMp4(m_pOc, m_pVideoSt);
 	//cout << "The window will close" << endl;
 	
-	if (m_pOc)
-		av_write_trailer(m_pOc);
-
-	/*m_pVideoSt = NULL;
-
-	if (m_pOc && !(m_pOc->oformat->flags & AVFMT_NOFILE))
-	avio_close(m_pOc->pb);
-
-	if (m_pOc)
-	{
-	avformat_free_context(m_pOc);
-	m_pOc = NULL;
-	}*/
+	this->m_bStop = true;
 
 	MessageBox("The window will close");
 	
